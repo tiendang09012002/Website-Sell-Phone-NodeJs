@@ -1,0 +1,38 @@
+<%- include("./layouts/head.ejs",{title:"Home"})%>
+
+<%- include("./layouts/header.ejs")%>
+
+<%- include("./layouts/menu.ejs")%>
+<%- include("./layouts/slider.ejs")%>
+                
+                <!--	Feature Product	-->
+                <div class="products">
+                    <h3>Sản phẩm nổi bật</h3>
+                    <div class="product-list card-deck">
+                        <%for(let product of productsFeartured){%>
+                            <%-include("./component/product-item.ejs",{product})%>
+                            <%}%>
+                        
+                        
+                    </div>
+                    
+                </div>
+                <!--	End Feature Product	-->
+                
+                
+                <!--	Latest Product	-->
+                <div class="products">
+                    <h3>Sản phẩm mới</h3>
+                    <div class="product-list card-deck">
+                        <%for(let product of products){%>
+                            <%-include("./component/product-item.ejs",{product})%>
+                            
+                            <%}%>
+                    </div>
+                    
+                </div>
+                <!--	End Latest Product	-->
+                
+            </div>
+            <%- include("./layouts/sidebar.ejs")%>
+            <%- include("./layouts/footer.ejs")%>

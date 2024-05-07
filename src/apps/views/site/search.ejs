@@ -1,0 +1,55 @@
+<%- include("./layouts/head.ejs",{title:"Search"})%>
+
+<%- include("./layouts/header.ejs")%>
+
+<%- include("./layouts/menu.ejs")%>
+<%- include("./layouts/slider.ejs")%>
+                
+                <!--	List Product	-->
+                <div class="products">
+                    <div id="search-result">Kết quả tìm kiếm với sản phẩm <span><%=keyword%></span></div>
+                    <div class="product-list card-deck">
+                        <%for(let product of products){%>
+                            <%-include("./component/product-item.ejs",{product})%>
+                            
+                            <%}%>
+                       
+                        
+                    </div>
+                    
+                </div>
+                <!--	End List Product	-->
+                
+                <div id="pagination">
+                    <ul class="pagination">
+                        
+                        <%if(currentPage>1){%>
+                            <li class="page-item"><a class="page-link"
+                                    href="../../search?keyword=<%=keyword%>&page=<%=currentPage-1%>">Trang trước</a></li>
+                            <%}%>
+                                <%for(let page of pages){ %>
+                                    <%if(page==="..."){ %>
+                                        <li class="page-item">
+                                            <span class="page-link"
+                                                >
+                                                <%=page%>
+                                        </span></li>
+                                        <%}else{%>
+                                            <li class="page-item <%=page==currentPage?'active' :'' %>">
+                                                <a class="page-link"
+                                                    href="../../search?keyword=<%=keyword%>&page=<%=page%>">
+                                                    <%=page%>
+                                                </a></li>
+                                            <%}%>
+                                                <%}%>
+                                                    <%if(currentPage < totalPages){%>
+                                                        <li class="page-item"><a class="page-link"
+                                                                href="../../search?keyword=<%=keyword%>&page=<%=currentPage+1%>">Trang sau</a>
+                                                        </li>
+                                                        <%}%>
+                    </ul> 
+                </div>
+                
+            </div>
+            <%- include("./layouts/sidebar.ejs")%>
+            <%- include("./layouts/footer.ejs")%>

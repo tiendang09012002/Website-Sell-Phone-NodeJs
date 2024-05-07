@@ -1,0 +1,235 @@
+<%- include("../layout/head.ejs",{title:"User Managers"})%>
+	<%- include("../layout/header.ejs")%>
+		<%- include("../layout/sidebar.ejs")%>
+			<div class="col-sm-9 col-sm-offset-3 col-lg-10 col-lg-offset-2 main">
+				<div class="row">
+					<ol class="breadcrumb">
+						<li><a href="#"><svg class="glyph stroked home">
+									<use xlink:href="#stroked-home"></use>
+								</svg></a></li>
+						<li><a href="">Quản lý thành viên</a></li>
+						<li class="active">Thùng rác</li>
+					</ol>
+				</div><!--/.row-->
+
+				<div class="row">
+					<div class="col-lg-12">
+						<h1 class="page-header">Quản lý thùng rác thành viên</h1>
+					</div>
+				</div><!--/.row-->
+				<div id="toolbar" class="btn-group">
+					<a href="/admin/users" class="btn">
+						<i class="glyphicon glyphicon-arrow-left"></i> Quản lí thành viên
+					</a>
+				</div>
+				<form action="/admin/users/actionmany" method="post">
+					<div class="row">
+						<div class="col-md-12">
+							<div class="panel panel-default">
+								<div class="panel-body">
+									
+									<table data-toolbar="#toolbar" data-toggle="table">
+
+										<thead>
+											<tr>
+												<th data-field="id" data-sortable="true">STT</th>
+												<th>Email</th>
+												<th>Tên đầy đủ</th>
+												<th>Thời gian xóa</th>
+												<th>Hành động</th>
+												<th><input type="checkbox" id="checkall"> Tất cả</th>
+											</tr>
+										</thead>
+										<tbody>
+											<% var i=0; for(let user of users){ i++; %>
+												<tr>
+													<td style="">
+														<%=i%>
+													</td>
+													<td style="">
+														<%= user.email%>
+													</td>
+													<td style="">
+														<%= user.full_name%>
+													</td>
+													<td style="">
+														<%=moment(user.deletedAt).format('LT')%>
+                                                    <%=moment(user.deletedAt).format('L');%>
+													</td>
+													<td class="form-group">
+														<a href="/admin/users/restore/<%= user._id%>"
+															class="btn btn-primary"><i
+																class="glyphicon glyphicon-repeat"></i></a>
+														<button type="button" data-toggle="modal"
+															data-id="<%=user._id%>" data-target="#exampleModal1"
+															class="btn btn-danger"><i
+																class="glyphicon glyphicon-remove"></i></button>
+													</td>
+													<td style=""><input value="<%= user._id%>" type="checkbox"
+															class="check-item" name="users[]"></td>
+												</tr>
+												<%}%>
+
+													<tr>
+														<td></td>
+														<td></td>
+														<td></td>
+														<td></td>
+														<td></td>
+														<td colspan="3">
+															<select name="action" id="action" required>
+																<option value="">--Chọn hành động--</option>
+																<option value="restore">Khôi phục</option>
+																<option value="delete">Xóa vĩnh viễn</option>
+
+															</select>
+															<button type="button" data-toggle="modal"
+																data-target="#exampleModal"
+																class="btn btn-primary btn_action">Thực hiện</button></td>
+													</tr>
+										</tbody>
+									</table>
+									<div style="text-align:right">
+
+
+									</div>
+								</div>
+								<div class="panel-footer">
+									<nav aria-label="Page navigation example">
+										<ul class="pagination">
+											<%if(currentPage>1){%>
+												<li class="page-item"><a class="page-link"
+														href="../../admin/users/trash?page=<%=currentPage-1%>">&laquo;</a>
+												</li>
+												<%}%>
+													<%for(let page of pages){ %>
+														<%if(page==="..."){ %>
+															<li class="page-item">
+																<span class="page-link">
+																	<%=page%>
+																</span>
+															</li>
+															<%}else{%>
+																<li
+																	class="page-item <%=page==currentPage?'active' :'' %>">
+																	<a class="page-link"
+																		href="../../admin/users/trash?page=<%=page%>">
+																		<%=page%>
+																	</a>
+																</li>
+																<%}%>
+																	<%}%>
+																		<%if(currentPage < totalPages){%>
+																			<li class="page-item"><a class="page-link"
+																					href="../../admin/users/trash?page=<%=currentPage+1%>">&raquo;</a>
+																			</li>
+																			<%}%>
+										</ul>
+									</nav>
+								</div>
+							</div>
+						</div>
+					</div><!--/.row-->
+					<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+						aria-hidden="true">
+						<div class="modal-dialog">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h5 class="modal-title titleMany" id="exampleModalLabel">Xác nhận xóa</h5>
+									<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+										<span aria-hidden="true">&times;</span>
+									</button>
+								</div>
+								<div class="modal-body bodyText">
+									Bạn có chắc chắn xóa các danh mục ?
+								</div>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy bỏ</button>
+									<button type="submit" id="deleteandrestore" class="btn btn-danger">Xóa</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</form>
+				<div class="modal fade" id="exampleModal1" tabindex="-1" aria-labelledby="exampleModalLabel"
+					aria-hidden="true">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title" id="exampleModalLabel">Xác nhận xóa</h5>
+								<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+									<span aria-hidden="true">&times;</span>
+								</button>
+							</div>
+							<div class="modal-body">
+								Bạn có chắc chắn xóa các danh mục vĩnh viễn ?
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy bỏ</button>
+								<button type="submit" id="submit_delete" class="btn btn-danger">Xóa vĩnh viễn</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div> <!--/.main-->
+			<form method="get" id="formDelete"></form>
+
+			<script src="js/jquery-1.11.1.min.js"></script>
+			<script src="js/bootstrap.min.js"></script>
+			<script src="js/bootstrap-table.js"></script>
+			<script>
+				document.addEventListener("DOMContentLoaded", function () {
+					var checkall = $("#checkall");
+					var listcheckbox = $("input.check-item")
+					var btnAction = $(".btn_action");
+					var btnDelete = $("#submit_delete")
+					toggleBtnsubmit()
+					checkall.change(() => {
+						var isCheck = checkall.is(":checked");
+						listcheckbox.prop("checked", isCheck)
+						toggleBtnsubmit();
+
+					})
+					listcheckbox.change(() => {
+						var isCheckall = listcheckbox.length === $("input.check-item:checked").length
+						checkall.prop("checked", isCheckall)
+						toggleBtnsubmit();
+
+					})
+					function toggleBtnsubmit() {
+						if ($("input.check-item:checked").length&&$('#action').val()) {
+							btnAction.removeClass('disabled')
+							btnAction.prop('disabled', false)
+							
+						} else {
+							btnAction.addClass('disabled')
+							btnAction.prop('disabled', true)
+							
+						}
+					}
+					$('#action').on('change',()=>{
+						toggleBtnsubmit();
+					})
+					btnAction.on('click', ()=>{
+						if($('#action').val()==="delete"){
+							$('.titleMany').text("Xác nhận xóa");
+							$('.bodyText').text("Bạn có chắc chắn xóa các thành viên này vĩnh viễn?");
+							$('#deleteandrestore').text("Xóa vĩnh viễn");
+						}
+						if($('#action').val()==="restore"){
+							$('.titleMany').text("Khôi phục");
+							$('.bodyText').text("Bạn có chắc chắn khôi phục các thành viên này?");
+							$('#deleteandrestore').text("Khôi phục");
+						}
+					})
+					$('#exampleModal1').on('show.bs.modal', function (event) {
+						let button = $(event.relatedTarget) // Button that triggered the modal
+						let id = button.data('id')
+						$("#formDelete").attr('action', `/admin/users/deletereal/${id}`)
+					})
+					btnDelete.on('click', () => {
+						$("#formDelete").submit()
+					})
+				})
+			</script>
+			<%- include("../layout/footer.ejs")%>

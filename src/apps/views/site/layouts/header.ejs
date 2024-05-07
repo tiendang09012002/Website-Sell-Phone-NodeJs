@@ -1,0 +1,181 @@
+<div id="header">
+    <div class="container">
+        <div class="row">
+            <div id="logo" class="col-lg-3 col-md-3 col-sm-12">
+                <h1><a href="/"><img class="img-fluid" src="../uploads/images/<%=setting.logo%>"></a></h1>
+            </div>
+            <div id="search" class="col-lg-6 col-md-6 col-sm-12">
+                <form class="form-inline" action="/search" method="get">
+                    <input onblur="hideFloatingDiv()" autocomplete="off" class="form-control mt-3 searchInput" id="searchInput" name="keyword" type="search" placeholder="Tìm kiếm" aria-label="Search">
+                    <button class="btn btn-danger mt-3" type="submit">Tìm kiếm</button>
+                </form>
+                <ul style="list-style: none; background-color: white; position: absolute; z-index: 1000;box-shadow: rgb(136, 136, 136) 3px 2px;
+                    border-radius: 8px;
+                    right: 20%;
+                    left: 4%;"class="searchBox" id="searchResults">
+                </ul>
+            </div>
+            <div id="cart" class="col-lg-3 col-md-3 col-sm-12">
+                <a class="mt-4 mr-2" href="/cart">giỏ hàng</a><span class="mt-3">
+                    <%=totalCartItems%>
+                </span>
+               
+                <%if(user&&!user.role){%>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-success dropdown-toggle hoverbtn" data-toggle="dropdown"
+                            aria-expanded="false">
+                            <%=user.full_name%>
+                        </button>
+                        <div class="dropdown-menu">
+                            <a style="color: black" class="dropdown-item" href="#">Tài khoản của tôi</a>
+                            <a style="color: black" class="dropdown-item" href="#">Đơn hàng của tôi</a>
+                            <div class="dropdown-divider"></div>
+                            <a style="color: black" class="dropdown-item" href="/user/logout">Đăng xuất</a>
+                        </div>
+                    </div>
+                    <%}else{%>
+                        <a  style="color: #ccc;margin-left: 10px;"  href="/user/login">Đăng nhập</a>
+                        
+                        <%}%>
+            </div>
+        </div>
+    </div>
+    <!-- Toggler/collapsibe Button -->
+    <button class="navbar-toggler navbar-light" type="button" data-toggle="collapse" data-target="#menu">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var dropdown = $(".hoverbtn");
+        var toggle = $(".dropdown-menu")
+        var toggleButton = false;
+        dropdown.click(function () {
+            if(!toggleButton){
+                toggle.css("display", "block")
+                toggleButton=!toggleButton
+            }else{
+                toggle.css("display", "none")
+                toggleButton=!toggleButton
+            }
+        })
+
+        // Lấy mật khẩu từ cookie khi click vào tên người dùng
+        $(".dropdown-toggle").click(function () {
+            var savedPassword = getCookie('savedPassword');
+            if (savedPassword) {
+                $("input[name='password']").val(savedPassword);
+            }
+        });
+
+        // Hàm lấy giá trị cookie
+        function getCookie(name) {
+            var match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+            if (match) return match[2];
+        }
+    })
+</script>
+<!--	End Header	-->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var searchInput = document.getElementById("searchInput");
+            var searchResults = document.getElementById("searchResults");
+            var currentPage = 1; // Trang hiện tại
+            var pageSize = 3; // Số sản phẩm hiển thị trên mỗi trang
+            var totalResults = 0; // Tổng số kết quả
+            var totalPages = 0; // Tổng số trang
+            var currentResults = []; // Danh sách sản phẩm hiện tại
+
+            // Sự kiện input trên input
+            document.addEventListener("click", function (event) {
+                if(event.target.classList.contains("searchBox") || event.target.classList.contains("searchInput") ){
+
+                }     
+                else{
+                   hideFloatingDiv() 
+                }      
+            })
+                
+            $(document).ready(function () {
+                // Gọi hàm khi input thay đổi
+                $("#searchInput").on("input", function () {
+                    var searchText = $(this).val().trim();
+                    if (searchText !== "") {
+                        // Gửi yêu cầu AJAX
+                        $.ajax({
+                            url: "/searchSuggestions",
+                            type: "GET",
+                            data: { keyword: searchText },
+                            dataType: "json",
+                            success: function (response) {
+                                console.log(response);
+                                showSearchResults(response)
+                            },
+                            error: function (xhr, status, error) {
+                                console.error("Error:", error);
+                            }
+                        });
+                    } else {
+                        // Ẩn div gợi ý nếu không có ký tự nào
+                        hideFloatingDiv();
+                    }
+                });
+                $("#searchInput").on("focus", function () {
+                    var searchText = $(this).val().trim();
+                    
+                        // Gửi yêu cầu AJAX
+                        $.ajax({
+                            url: "/searchSuggestions",
+                            type: "GET",
+                            data: { keyword: searchText },
+                            dataType: "json",
+                            success: function (response) {
+                                console.log(response);
+                                showSearchResults(response)
+                            },
+                            error: function (xhr, status, error) {
+                                console.error("Error:", error);
+                            }
+                        });
+                    
+                });
+            });
+
+            // Hiển thị gợi ý tìm kiếm
+
+
+            // Ẩn div gợi ý
+            function hideFloatingDiv() {
+                $("#searchResults").hide();
+            }
+
+
+            function showSearchResults(currentResults) {
+                var resultList = "";
+                if (currentResults.length > 0) {
+                    for (var i = 0; i < currentResults.length; i++) {
+                        var item = currentResults[i];
+                        resultList += `
+                            <li><a style="display:flex; padding: 10px; border-bottom: 1px #ccc solid;" href="/product-${item.slug}.${item._id}">
+                                <img style="width: 40px" class="img-fluid" src="../uploads/images/${item.thumbnail}">
+                                <div style="padding-left : 5px"><p>${item.name}</p>
+                                <p>${item.price}</p></div>
+                                </a></li>
+                            `;
+
+                    }
+                    searchResults.innerHTML = resultList;
+                    searchResults.style.display = "block";
+                } else {
+                    hideSearchResults();
+                }
+            }
+
+            function hideSearchResults() {
+                searchResults.innerHTML = "";
+                searchResults.style.display = "none";
+            }
+
+        })
+
+    </script>

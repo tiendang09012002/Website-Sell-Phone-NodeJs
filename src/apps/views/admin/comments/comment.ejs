@@ -1,0 +1,229 @@
+<%- include("../layout/head.ejs",{title:"Comment Managers"})%>
+    <%- include("../layout/header.ejs")%>
+        <%- include("../layout/sidebar.ejs")%>
+
+            <div class="col-sm-9 col-sm-offset-3 col-lg-10 col-lg-offset-2 main">
+                <div class="row">
+                    <ol class="breadcrumb">
+                        <li><a href="#"><svg class="glyph stroked home">
+                                    <use xlink:href="#stroked-home"></use>
+                                </svg></a></li>
+                        <li class="active">Danh sách bình luận</li>
+                    </ol>
+                </div><!--/.row-->
+
+                <div class="row">
+                    <div class="col-lg-12">
+                        <h1 class="page-header">Danh sách bình luận</h1>
+                    </div>
+                </div><!--/.row-->
+                <form method="post" action="/admin/comments/addkeyword">
+                    <!-- Modal -->
+                    <div style="top: 50%; transform: translateY(-50%);" class="modal fade" id="exampleModal1" tabindex="-1" aria-labelledby="exampleModalLabel"
+                        aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel">Thêm từ khóa</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                   <input name="keywords" required type="text" class="form-control"  placeholder="Nhập từ khóa..."/>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy bỏ</button>
+                                    <input type="submit" class="btn btn-primary" value="Thêm mới">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <form method="post" action="/admin/comments/deleteMany">
+                    <div id="toolbar" class="btn-group">
+                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#exampleModal1">
+                            <i class="glyphicon glyphicon-plus"></i> Thêm từ khóa nhạy cảm
+                        </button>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="panel panel-default">
+                                <div class="panel-body">
+                                    <div style="float: right;margin-top: 10px;">
+										<%if(totalTrash){%>
+											<a href="/admin/comments/trash" class="btn btn-danger"><i
+													style="margin-right: 5px;top: 2px;"
+													
+													class="glyphicon glyphicon-trash"></i>Thùng rác (<%=totalTrash%>)</a>
+											<%}else{%>
+												<span disabled class="btn btn-danger"><i
+														style="margin-right: 5px;top: 2px;"
+														class="glyphicon glyphicon-trash"></i>Thùng rác (<%=totalTrash%>)</span>
+												<%}%>
+									</div>
+                                    <table data-toolbar="#toolbar" data-toggle="table">
+
+                                        <thead>
+                                            <tr>
+                                                <th data-field="id" data-sortable="true">STT</th>
+                                                <th data-field="name" data-sortable="true">Họ & Tên</th>
+                                                <th data-field="price" data-sortable="true">Email</th>
+                                                <th>Nội dung</th>
+                                                <th>Sản phẩm</th>
+                                                <th>Hành động</th>
+                                                <th><input type="checkbox" id="checkall"> Tất cả</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+
+                                            <% var i=0; for(let comment of comments){ i++; %>
+                                                <tr>
+                                                    <td style="">
+                                                        <%=i%>
+                                                    </td>
+                                                    <td style="">
+                                                        <%= comment.full_name%>
+                                                    </td>
+                                                    <td style="">
+                                                        <%=comment.email%>
+                                                    </td>
+                                                    <td>
+                                                        <%=comment.body%>
+                                                    </td>
+                                                    <td>
+                                                        <%=comment.prd_id.name%>
+                                                    </td>
+
+                                                    <td class="form-group">
+                                                        <%if(comment.active){%>
+                                                            <span disabled
+                                                                class="btn btn-primary"><i
+                                                                    class="glyphicon glyphicon-check"></i></span>
+                                                            <%}else{%>
+                                                                <a href="/admin/comments/edit/<%=comment._id%>"
+                                                                    class="btn btn-primary"><i
+                                                                        class="glyphicon glyphicon-check"></i></a>
+                                                                <%}%>
+                                                        <a href="/admin/comments/delete/<%=comment._id%>"
+                                                            class="btn btn-danger"><i
+                                                                class="glyphicon glyphicon-remove"></i></a>
+                                                    </td>
+                                                    <td style=""><input value="<%= comment._id%>" type="checkbox"
+                                                            class="check-item" name="comments[]"></td>
+                                                </tr>
+
+                                                <%}%>
+                                                    <tr>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td></td>
+
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td colspan="3"><button type="button" data-toggle="modal"
+                                                                data-target="#exampleModal"
+                                                                class="btn btn-danger btn_action">Xóa</button></td>
+                                                    </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="panel-footer">
+                                    <nav aria-label="Page navigation example">
+                                        <ul class="pagination">
+                                            <%if(currentPage>1){%>
+                                                <li class="page-item"><a class="page-link"
+                                                        href="../../admin/comments?page=<%=currentPage-1%>">&laquo;</a>
+                                                </li>
+                                                <%}%>
+                                                    <%for(let page of pages){ %>
+                                                        <%if(page==="..."){ %>
+                                                            <li class="page-item">
+                                                                <span class="page-link">
+                                                                    <%=page%>
+                                                                </span>
+                                                            </li>
+                                                            <%}else{%>
+                                                                <li
+                                                                    class="page-item <%=page==currentPage?'active' :'' %>">
+                                                                    <a class="page-link"
+                                                                        href="../../admin/comments?page=<%=page%>">
+                                                                        <%=page%>
+                                                                    </a>
+                                                                </li>
+                                                                <%}%>
+                                                                    <%}%>
+                                                                        <%if(currentPage < totalPages){%>
+                                                                            <li class="page-item"><a class="page-link"
+                                                                                    href="../../admin/comments?page=<%=currentPage+1%>">&raquo;</a>
+                                                                            </li>
+                                                                            <%}%>
+                                        </ul>
+                                    </nav>
+                                </div>
+                            </div>
+                        </div>
+                    </div><!--/.row-->
+                    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+                        aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel">Xác nhận xóa</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    Bạn có chắc chắn xóa các bình luận ?
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy bỏ</button>
+                                    <button type="submit" class="btn btn-danger">Xóa</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div> <!--/.main-->
+
+
+
+            <script src="js/jquery-1.11.1.min.js"></script>
+            <script src="js/bootstrap.min.js"></script>
+            <script src="js/bootstrap-table.js"></script>
+            <script>
+                document.addEventListener("DOMContentLoaded", function () {
+                    var checkall = $("#checkall");
+                    var listcheckbox = $("input.check-item")
+                    var btnAction = $(".btn_action");
+
+                    toggleBtnsubmit()
+                    checkall.change(() => {
+                        var isCheck = checkall.is(":checked");
+                        listcheckbox.prop("checked", isCheck)
+                        toggleBtnsubmit();
+
+                    })
+                    listcheckbox.change(() => {
+                        var isCheckall = listcheckbox.length === $("input.check-item:checked").length
+                        checkall.prop("checked", isCheckall)
+                        toggleBtnsubmit();
+
+                    })
+                    function toggleBtnsubmit() {
+                        if ($("input.check-item:checked").length) {
+                            btnAction.removeClass('disabled')
+                            btnAction.prop('disabled', false)
+
+                        } else {
+                            btnAction.addClass('disabled')
+                            btnAction.prop('disabled', true)
+
+                        }
+
+                    }
+                })
+            </script>
+            <%- include("../layout/footer.ejs")%>

@@ -1,0 +1,156 @@
+<%- include("./layout/head.ejs",{title:"admin" })%>
+<%- include("./layout/header.ejs")%>
+<%- include("./layout/sidebar.ejs")%>
+
+<div class="col-sm-9 col-sm-offset-3 col-lg-10 col-lg-offset-2 main">
+	<div class="row">
+		<ol class="breadcrumb">
+			<li><a href="#"><svg class="glyph stroked home">
+						<use xlink:href="#stroked-home"></use>
+					</svg></a></li>
+			<li class="active">Danh sách Slider</li>
+		</ol>
+	</div><!--/.row-->
+
+	<div class="row">
+		<div class="col-lg-12">
+			<h1 class="page-header">Danh sách Slider</h1>
+		</div>
+	</div><!--/.row-->
+	<form method="post" action="/admin/slides/deleteMany">
+	<div id="toolbar" class="btn-group">
+		<a href="/admin/slides/create" class="btn btn-success">
+			<i class="glyphicon glyphicon-plus"></i> Thêm Slider
+		</a>
+	</div>
+	<div class="row">
+		<div class="col-lg-12">
+			<div class="panel panel-default">
+				<div class="panel-body">
+					<table data-toolbar="#toolbar" data-toggle="table">
+
+						<thead>
+							<tr>
+								<th data-field="id" data-sortable="true">ID</th>
+								<th data-field="name" data-sortable="true">Tên quảng cáo</th>
+								
+								<th>Ảnh quảng cáo</th>
+								<th>Vị trí</th>
+							
+								<th>Hành động</th>
+								<th><input type="checkbox" id="checkall"> Tất cả</th>
+							</tr>
+						</thead>
+						<tbody>
+							
+							<% var i=0; for (let slide of slides){ i++; %>
+								<tr>
+									<td style="">
+										<%=i%>
+									</td>
+									<td style="">
+										<%= slide.name%>
+									</td>
+									
+									<td style="text-align: center"><img width="130" height="180"
+											src="../uploads/images/<%= slide.thumbnail%>" /></td>
+
+											<td style="">
+												<%= slide.position%>
+											</td>
+									
+									<td class="form-group">
+										<a href="/admin/slides/edit/<%= slide._id%>" class="btn btn-primary"><i
+												class="glyphicon glyphicon-pencil"></i></a>
+										<a href="/admin/slides/delete/<%= slide._id%>" class="btn btn-danger"><i
+												class="glyphicon glyphicon-remove"></i></a>
+									</td>
+									<td style=""><input value="" type="checkbox"
+										class="check-item" name=""></td>
+								</tr>
+								<%}%>
+							
+								
+								<tr>
+									<td></td>
+									<td></td>
+									<td></td>
+									<td></td>
+									<td></td>
+									
+
+									
+									
+									<td colspan="3"><button type="button" data-toggle="modal"
+											data-target="#exampleModal"
+											class="btn btn-danger btn_action">Xóa</button></td>
+								</tr>
+
+						</tbody>
+					</table>
+				</div>
+				
+			</div>
+		</div>
+	</div><!--/.row-->
+	<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+			aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLabel">Xác nhận xóa</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						Bạn có chắc chắn xóa các Sản phẩm ?
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy bỏ</button>
+						<button type="submit" class="btn btn-danger">Xóa</button>
+					</div>
+				</div>
+			</div>
+		</div>
+</form>
+</div> <!--/.main-->
+
+<script src="js/jquery-1.11.1.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/bootstrap-table.js"></script>
+<script>
+	document.addEventListener("DOMContentLoaded", function () {
+		var checkall = $("#checkall");
+		var listcheckbox = $("input.check-item")
+		var btnAction = $(".btn_action");
+
+		toggleBtnsubmit()
+		checkall.change(() => {
+			var isCheck = checkall.is(":checked");
+			listcheckbox.prop("checked", isCheck)
+			toggleBtnsubmit();
+
+		})
+		listcheckbox.change(() => {
+			var isCheckall = listcheckbox.length === $("input.check-item:checked").length
+			checkall.prop("checked", isCheckall)
+			toggleBtnsubmit();
+
+		})
+		function toggleBtnsubmit() {
+			if ($("input.check-item:checked").length) {
+				btnAction.removeClass('disabled')
+				btnAction.prop('disabled', false)
+
+			} else {
+				btnAction.addClass('disabled')
+				btnAction.prop('disabled', true)
+
+			}
+
+		}
+	})
+</script>
+	<%- include("./layout/footer.ejs")%>
+
